@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \usepackage{fancyvrb}
 \usepackage[absolute]{textpos}\TPGrid{16}{16}
+\usepackage{tikz-uml}
 \usepackage{tikz}
   \usetikzlibrary{shapes}
   \usetikzlibrary{arrows}
@@ -306,7 +307,7 @@ Engine store repository configuration in a .yml file. An example:
 \begin{Verbatim}[tabsize=2]
 repo:
 	type: maven
-	name: my-npm-repo
+	name: my-repo
 	storage:
 		type: s3
 		url: s3://acme.com/snapshot
