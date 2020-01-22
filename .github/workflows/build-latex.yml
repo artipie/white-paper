@@ -11,7 +11,7 @@ jobs:
         with:
           root_file: wp.tex
       - name: Set env
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'pull_request'
         run: echo ::set-env name=GITHUB_SHA_SHORT::$(echo $GITHUB_SHA | cut -c 1-6)
       - name: Create Release
         id: create_release
