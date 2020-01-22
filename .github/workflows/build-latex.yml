@@ -10,14 +10,16 @@ jobs:
         uses: xu-cheng/latex-action@master
         with:
           root_file: wp.tex
+      - name: Set env
+        run: echo ::set-env name=GITHUB_SHA_SHORT::$(echo $GITHUB_SHA | cut -c 1-6)
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.GITHUB_SHA }}
-          release_name: Release ${{ github.GITHUB_SHA }}
+          tag_name: ${{ env.GITHUB_SHA_SHORT }}
+          release_name: Release ${{ env.GITHUB_SHA_SHORT }}
           body: |
             Changes in this Release
             - First Change
