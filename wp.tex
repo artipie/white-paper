@@ -10,7 +10,9 @@
 \usepackage{setspace}
 \usepackage{pgfplots}
 \usepackage{graphicx}
+\usepackage{fancyvrb}
 \usepackage[absolute]{textpos}\TPGrid{16}{16}
+\usepackage{tikz-uml}
 \usepackage{tikz}
   \usetikzlibrary{shapes}
   \usetikzlibrary{arrows}
@@ -289,7 +291,68 @@ Smaller companies may have lower expectations.
 
 \section{Architecture}
 
+Architecure is consisted of 4 essential parts:
 
+\begin{enumerate}
+	\item Artipie engine
+	\item Repository adapters
+	\item Abstract storage
+	\item Extensions
+\end{enumerate}
+\subsection{Artipie engine}
+\label{sec:arti-engine}
+Artipie engine is a java application, which exposes an HTTP endpoint for repository access and management operations.
+
+Engine store repository configuration in a .yml file. An example:
+\begin{Verbatim}[tabsize=2]
+repo:
+	type: maven
+	storage:
+		type: s3
+		url: s3://acme.com/snapshot
+		username: admin
+    password: 123qwe
+ \end{Verbatim}
+
+This configuration file says that it has a type of maven repository,
+which automatically enable maven specific metadata generation logic.
+Diving into storage section, artipie asked to use s3 object storage 
+as a storage for uploaded artifacts and generated metadata.   
+
+The ability to chose where to store artifact gave us the flexibility of choice.
+We can choose any type of storage, whether it is a server file system,
+an object storage, or a key-value database.
+The only requirement is: \hyperref[sec:asto]{Abstract storage} should support it.
+
+Aside from repository configuration, the way artipie stores its settings
+also can be customized via artipie.yml file:
+\begin{Verbatim}[tabsize=2]
+meta:
+  storage:
+    type: fs
+    url: file:///artipie/settings
+\end{Verbatim}
+Artipie will resolve this file, and use local filesystem folder for repository settings management. 
+
+\subsection{Repository adapters}
+Repository adapters are independent projects, 
+aimed to implement meta information generation
+layers for a specific package type(npm, maven, etc...).
+\hyperref[sec:arti-engine]{Artipie engine} utilizes adapters in order to provide BRM functionality.
+
+Existed adapters:
+\begin{itemize}
+	\item rpm - \href{https://github.com/artipie/npm-adapter}{artipie/npm-adapter}
+	\item npm - \href{https://github.com/artipie/rpm-adapter}{artipie/rpm-adapter}
+	\item go - \href{https://github.com/artipie/go-adapter}{artipie/go-adapter}
+\end{itemize}
+
+\subsection{Abstract storage}
+\label{sec:asto}
+to be written...
+
+\subsection{Extensions}
+to be written...
 
 \section{Conclusion}
 \label{sec:conclusion}
