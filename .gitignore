@@ -2,7 +2,6 @@ target/
 .idea/
 *.iml
 .DS_Store
-*.pdf
 *.aux
 *.log
 *.bcf
