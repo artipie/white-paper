@@ -20,10 +20,7 @@ jobs:
         with:
           tag_name: ${{ env.GITHUB_SHA_SHORT }}
           release_name: Release ${{ env.GITHUB_SHA_SHORT }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          body: Auto-generated release
           draft: false
           prerelease: false
       - name: Upload Release Asset
