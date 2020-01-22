@@ -18,8 +18,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release based on commit $SHA8
+          tag_name: ${{ GITHUB_SHA }}
+          release_name: $SHA8
           draft: false
           prerelease: false
       - name: Upload Release Asset
