@@ -11,6 +11,7 @@ jobs:
         with:
           root_file: wp.tex
       - name: Set env
+        if: github.event_name == 'pull_request'
         run: echo ::set-env name=GITHUB_SHA_SHORT::$(echo $GITHUB_SHA | cut -c 1-6)
       - name: Create Release
         id: create_release
@@ -18,7 +19,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ env.GITHUB_SHA_SHORT }}
+          tag_name: release-${{ env.GITHUB_SHA_SHORT }}
           release_name: Release ${{ env.GITHUB_SHA_SHORT }}
           body: Auto-generated release
           draft: false
