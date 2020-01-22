@@ -3,6 +3,8 @@ on: [push]
 jobs:
   build_latex:
     runs-on: ubuntu-latest
+    env:
+      SHA8: ${GITHUB_SHA::8}
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v1
@@ -16,7 +18,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ SHA8 }}
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
