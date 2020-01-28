@@ -298,6 +298,22 @@ Architecure is consisted of 4 essential parts:
 	\item Abstract storage
 	\item Extensions
 \end{enumerate}
+\begin{tikzpicture}
+  \node[block] (clients) {Clients};
+  \node[block, below=of clients] (ext) {Extensions};
+  \node[block, right=of clients] (engine) {Artipie engine};
+  \node[block, right=of engine] (adapter-http) {http-interface};
+  \node[block, right=of adapter-http] (adapter-meta) {metadata generator};
+  \node[fit=(adapter-http)(adapter-meta), draw, dashed, inner sep=1cm, label={[right=0cm, below=0.1cm]\Large Adapter}] (adapter) {};
+  \node[block, below=of adapter] (asto) {Abstract storage};
+  \draw [->] (clients) -- node {interact} (engine);
+  \draw [->] (ext) -- node[sloped] {interact} (engine);
+  \draw [->] (engine) -- node[sloped,text width=2.0cm] {\tiny proxy artifact related requests} (adapter-http);
+  \draw [->] (adapter-http) -- node {triggers} (adapter-meta);
+  \draw [->] (adapter-http) -- node[sloped, anchor=center, above, text width=2.0cm] {download/upload} (asto);
+  \draw [->] (adapter-meta) -- node[sloped, anchor=center, above, text width=2.0cm] {updates metadata} (asto);
+\end{tikzpicture}
+
 \subsection{Artipie engine}
 \label{sec:arti-engine}
 Artipie engine is a java application, which exposes an HTTP endpoint for repository access and management operations.
