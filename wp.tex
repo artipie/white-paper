@@ -379,12 +379,12 @@ Those design requirements were considered as most important for the asto:
 
 The following design options has been considered for the interface design implementation:
 \begin{itemize}
-  \item java.io.{In,Out}putStream's based option. 
+  \item \dd{java.io.\{In,Out\}putStream}'s based option. 
   \item RxJava 3 based option.
 	\item CompletableFuture and Java 9 Flow based option.
 \end{itemize}
 
-The java.io.{In,Out}putStream's approach has a conceptual drawback: it's blocking nature,
+The \dd{java.io.\{In,Out\}putStream}'s approach has a conceptual drawback: it's blocking nature,
 which affects performance by forcing new thread allocation per user connection. And that is
 also a reason why any other blocking approach was not considered.
 
@@ -392,8 +392,8 @@ The RxJava 3 option is close to the ideal one, but the negative side is external
 dependency exposition: clients are getting bounded to the RxJava primitives. 
 
 Java non-blocking primitives were counted as the most promising
-ones, since CompletableFuture and Flow-based interface can be implemented in a 
-high-performance way and accordance with all the mentioned requirements.
+ones, since \dd{CompletableFuture} and \dd{Flow}-based interface can be implemented in a 
+high-performance way and with accordance all the mentioned requirements.
 
 \subsection{Extensions}
 to be written...
