@@ -92,24 +92,21 @@ as noted by~\textcite{davis2016}.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
-  \node[block, text width=2cm] (sources) {Source Code Repo};
-  \node[block, right=of sources] (builder) {Builder};
-  \node[block, above=of builder, text width=3cm] (ci) {Continuous Integration};
-  \node[block, right=of builder] (artifact) {Artifact};
-  \node[block, fill=myblack, text=white, below=of artifact] (brm) {\bfseries BRM};
-  \node[below=of sources] (dev) {Programmer};
-  \node[below left=of brm] (teams) {Other Teams};
-  \path[ln]
-    (sources) edge (builder)
-    (ci) edge node {trigger} (builder)
-    (builder) edge (artifact)
-    (artifact) edge node {deploy} (brm)
-    (brm) edge node {share} (teams)
-    (dev) edge node {commit} (sources)
-    (dev) edge node {analyze} (brm)
-    (brm) edge node {use} (builder);
+  \node[block, minimum width=4cm] (src) {Source code};
+  \node[block, below=of src, minimum width=4cm] (commit) {\textless commit\textgreater};
+  \node[fit=(commit), draw, dashed, inner sep=0.3cm, label={[label distance=0.1cm]0:Repository (git)}] (repo) {};
+  \node[block, below=of commit, minimum width=4cm] (build) {.jar};
+  \node[fit=(build), draw, dashed, inner sep=0.3cm, label={[label distance=0.1cm]0:CI/CD (build)}] (cicd) {};
+  \node[block, below=of build, minimum width=4cm] (artifact) {com.artipie:artipie:1.0};
+  \node[fit=(artifact), draw, dashed, inner sep=0.3cm, label={[label distance=0.1cm]0:BRM (Artipie)}] (brm) {};
+  \node[block, below=of artifact, minimum width=4cm] (users) {Users};
+  \path[ln] (src) edge node {push} (commit);
+  \path[ln] (commit) edge node {trigger} (build);
+  \path[ln] (build) edge node {deploy} (artifact);
+  \draw[ln] (artifact.west) -- ([xshift=-10mm]artifact.west) -- node[left] {depends} ([xshift=-10mm]src.west) -- (src.west);
+  \draw[ln] (artifact.south) -- node[right] {uses} (users);
 \end{tikzpicture}
-\caption{The flow of data in an average software development team.}
+\caption{The deliver pipeline of an average software development team.}
 \label{fig:map}
 \end{figure}
 
@@ -293,46 +290,89 @@ Smaller companies may have lower expectations.
 Architecure is consisted of 4 essential parts:
 
 \begin{enumerate}
-	\item Artipie engine
-	\item Repository adapters
-	\item Abstract storage
-	\item Extensions
+	\item Artipie HTTP engine
+        \item Authorization and authentication layer
+	\item Repositories
+	\item Storage
 \end{enumerate}
 \begin{tikzpicture}
-  \node[block] (clients) {Clients};
-  \node[block, below=of clients] (ext) {Extensions};
-  \node[block, right=of clients] (engine) {Artipie engine};
-  \node[block, right=of engine] (adapter-http) {http-interface};
-  \node[block, right=of adapter-http] (adapter-meta) {metadata generator};
-  \node[fit=(adapter-http)(adapter-meta), draw, dashed, inner sep=1cm, label={[right=0cm, below=0.1cm]\Large Adapter}] (adapter) {};
-  \node[block, below=of adapter] (asto) {Abstract storage};
-  \draw [->] (clients) -- node {interact} (engine);
-  \draw [->] (ext) -- node[sloped] {interact} (engine);
-  \draw [->] (engine) -- node[sloped,text width=2.0cm] {\tiny proxy artifact related requests} (adapter-http);
-  \draw [->] (adapter-http) -- node {triggers} (adapter-meta);
-  \draw [->] (adapter-http) -- node[sloped, anchor=center, above, text width=2.0cm] {download/upload} (asto);
-  \draw [->] (adapter-meta) -- node[sloped, anchor=center, above, text width=2.0cm] {updates metadata} (asto);
+  \node[block] (repo-2) {Repo};
+  \node[block, left=of repo-2] (repo-1) {Repo};
+  \node[block, right=of repo-2] (repo-3) {Repo};
+  \node[fit=(repo-1)(repo-2)(repo-3), draw, dashed, inner sep=1cm, label={[right=10cm, below=0.1cm]1cm:Repositories}] (repos) {};
+  \node[block, above=of repos, minimum width=7cm] (auth) {authentication};
+  \node[block, above=of auth, minimum width=7cm] (http) {HTTP layer, routing and dispatching};
+  \node[block, below=of repo-1] (storage-1) {Storage};
+  \node[block, below=of repo-2] (storage-2) {Storage};
+  \node[block, below=of repo-3] (storage-3) {Storage};
+  \path[ln] (repo-1) -- (storage-1);
+  \path[ln] (repo-2) -- (storage-2);
+  \path[ln] (repo-3) -- (storage-3);
+  \path[ln] (http) -- (auth);
+  \path[ln] (auth) edge node {routes} (repos);
+  \draw (repos.north) -- (repo-1.north);
+  \draw (repos.north) -- (repo-2.north);
+  \draw (repos.north) -- (repo-3.north);
 \end{tikzpicture}
 
 \subsection{Artipie engine}
 \label{sec:arti-engine}
-Artipie engine is a java application, which exposes an HTTP endpoint for repository access and management operations.
+Artipie engine is a Java application, which exposes an HTTP endpoint for repository access and management operations.
+It routes HTTP requests to repositories and provide authentication mechanisms for repositories.
+Each repository encapsulates storage API to access binary blobs and metadata files.
+
+\begin{tikzpicture}
+  \node[block] (repo-2) {Repo};
+  \node[block, left=of repo-2] (repo-1) {Repo};
+  \node[block, right=of repo-2] (repo-3) {Repo};
+  \node[fit=(repo-1)(repo-2)(repo-3), draw, dashed, inner sep=1cm, label={[right=10cm, below=0.1cm]1cm:Repositories}] (repos) {};
+  \node[block, above=of repos, minimum width=7cm] (auth) {authentication};
+  \node[block, above=of auth, minimum width=7cm] (http) {HTTP layer, routing and dispatching};
+  \node[block, below=of repo-1] (storage-1) {Storage};
+  \node[block, below=of repo-2] (storage-2) {Storage};
+  \node[block, below=of repo-3] (storage-3) {Storage};
+  \path[ln] (repo-1) -- (storage-1);
+  \path[ln] (repo-2) -- (storage-2);
+  \path[ln] (repo-3) -- (storage-3);
+  \path[ln] (http) -- (auth);
+  \path[ln] (auth) edge node {routes} (repos);
+  \draw (repos.north) -- (repo-1.north);
+  \draw (repos.north) -- (repo-2.north);
+  \draw (repos.north) -- (repo-3.north);
+\end{tikzpicture}
+
+There are various storage implementations, such as:
+\begin{enumerate}
+    \item File system storage
+    \item S3 based storage
+    \item In-memory storage
+\end{enumerate}
+
+\begin{tikzpicture}
+  \node[block] (storage) {Storage};
+  \node[block, minimum width=2cm, below=of storage] (s3) {S3};
+  \node[block, minimum width=2cm, right=of s3] (fs) {FS};
+  \node[block, minimum width=2cm, left=of s3] (im) {IM};
+  \draw[-latex] (s3.north) -- (storage.south);
+  \draw (fs.north) |- (270:10mm) -| ([yshift=-1pt]storage.south);
+  \draw (im.north) |- (270:10mm) -| ([yshift=-1pt]storage.south);
+\end{tikzpicture}
 
 Engine store repository configuration in a .yml file. An example:
 \begin{Verbatim}[tabsize=2]
 repo:
-	type: maven
-	storage:
-		type: s3
-		url: s3://acme.com/snapshot
-		username: admin
+  type: maven
+  storage:
+    type: s3
+    url: s3://acme.com/snapshot
+    username: admin
     password: 123qwe
- \end{Verbatim}
+\end{Verbatim}
 
 This configuration file says that it has a type of maven repository,
 which automatically enable maven specific metadata generation logic.
-Diving into storage section, artipie asked to use s3 object storage 
-as a storage for uploaded artifacts and generated metadata.   
+Diving into storage section, artipie asked to use S3 object storage 
+as a storage for uploaded artifacts and generated metadata.
 
 The ability to chose where to store artifact gave us the flexibility of choice.
 We can choose any type of storage, whether it is a server file system,
@@ -357,9 +397,12 @@ layers for a specific package type(npm, maven, etc...).
 
 Existed adapters:
 \begin{itemize}
-	\item rpm - \href{https://github.com/artipie/npm-adapter}{artipie/npm-adapter}
-	\item npm - \href{https://github.com/artipie/rpm-adapter}{artipie/rpm-adapter}
-	\item go - \href{https://github.com/artipie/go-adapter}{artipie/go-adapter}
+	\item RPM - \href{https://github.com/artipie/npm-adapter}{artipie/npm-adapter}
+	\item NPM - \href{https://github.com/artipie/rpm-adapter}{artipie/rpm-adapter}
+	\item Go - \href{https://github.com/artipie/go-adapter}{artipie/go-adapter}
+	\item Docker - \href{https://github.com/artipie/go-adapter}{artipie/docker-adapter}
+	\item Maven - \href{https://github.com/artipie/go-adapter}{artipie/maven-adapter}
+	\item Gem - \href{https://github.com/artipie/go-adapter}{artipie/gem-adapter}
 \end{itemize}
 
 \subsection{Abstract storage}
