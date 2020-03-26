@@ -14,6 +14,7 @@
 \usepackage[absolute]{textpos}\TPGrid{16}{16}
 \usepackage{tikz}
   \usetikzlibrary{shapes}
+  \usetikzlibrary{arrows.meta}
   \usetikzlibrary{arrows}
   \usetikzlibrary{shadows}
   \usetikzlibrary{trees}
@@ -321,24 +322,28 @@ Artipie engine is a Java application, which exposes an HTTP endpoint for reposit
 It routes HTTP requests to repositories and provide authentication mechanisms for repositories.
 Each repository encapsulates storage API to access binary blobs and metadata files.
 
-\begin{tikzpicture}
-  \node[block] (repo-2) {Repo};
-  \node[block, left=of repo-2] (repo-1) {Repo};
-  \node[block, right=of repo-2] (repo-3) {Repo};
-  \node[fit=(repo-1)(repo-2)(repo-3), draw, dashed, inner sep=1cm, label={[right=10cm, below=0.1cm]1cm:Repositories}] (repos) {};
-  \node[block, above=of repos, minimum width=7cm] (auth) {authentication};
-  \node[block, above=of auth, minimum width=7cm] (http) {HTTP layer, routing and dispatching};
-  \node[block, below=of repo-1] (storage-1) {Storage};
-  \node[block, below=of repo-2] (storage-2) {Storage};
-  \node[block, below=of repo-3] (storage-3) {Storage};
-  \path[ln] (repo-1) -- (storage-1);
-  \path[ln] (repo-2) -- (storage-2);
-  \path[ln] (repo-3) -- (storage-3);
-  \path[ln] (http) -- (auth);
-  \path[ln] (auth) edge node {routes} (repos);
-  \draw (repos.north) -- (repo-1.north);
-  \draw (repos.north) -- (repo-2.north);
-  \draw (repos.north) -- (repo-3.north);
+\begin{tikzpicture}[]
+  \node[block, minimum width=3cm] (repo) {Repository};
+  \node[block, minimum width=3cm, right=of repo] (storage) {Storage};
+  \matrix[row sep=10mm, column sep=10mm, yshift=-2cm]{
+    \node[block, minimum width=3cm] (rpm) {RPM}; &
+    \node[block, minimum width=3cm] (npm) {NPM}; &
+    \node[block, minimum width=3cm] (maven) {Maven}; \\
+  };
+  \matrix[row sep=10mm, column sep=10mm, yshift=-4cm]{
+    \node[block, minimum width=3cm] (nuget) {Nuget}; &
+    \node[block, minimum width=3cm] (composer) {PHP}; &
+    \node[block, minimum width=3cm] (pypi) {PyPi}; &
+    \node[block, minimum width=3cm] (docker) {Docker}; \\
+  };
+  \draw[-latex] (repo) -- (storage);
+  \draw[-latex] (npm.north) -- (repo.south);
+  \draw (rpm.north) |- (270:10mm) -| ([yshift=-1pt]repo.south);
+  \draw (maven.north) |- (270:10mm) -| ([yshift=-1pt]repo.south);
+  \draw (nuget.north) |- (270:10mm) -| ([yshift=-1pt]repo.south);
+  \draw (composer.north) |- (270:10mm) -| ([yshift=-1pt]repo.south);
+  \draw (pypi.north) |- (270:10mm) -| ([yshift=-1pt]repo.south);
+  \draw (docker.north) |- (270:10mm) -| ([yshift=-1pt]repo.south);
 \end{tikzpicture}
 
 There are various storage implementations, such as:
@@ -348,7 +353,7 @@ There are various storage implementations, such as:
     \item In-memory storage
 \end{enumerate}
 
-\begin{tikzpicture}
+\begin{tikzpicture}[]
   \node[block] (storage) {Storage};
   \node[block, minimum width=2cm, below=of storage] (s3) {S3};
   \node[block, minimum width=2cm, right=of s3] (fs) {FS};
