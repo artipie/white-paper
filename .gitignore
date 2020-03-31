@@ -10,3 +10,4 @@ target/
 *.fls
 *.run.xml
 *.blg
+wp.pdf
