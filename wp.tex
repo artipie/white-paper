@@ -22,6 +22,7 @@
   \usetikzlibrary{calc}
   \usetikzlibrary{positioning}
   \usetikzlibrary{decorations.pathmorphing}
+\usepackage{./tikz-uml}
 \usepackage{everypage}
   \AddEverypageHook{
     \begin{textblock}{0.5}[0,0](0,0)
@@ -362,6 +363,35 @@ There are various storage implementations, such as:
   \draw (fs.north) |- (270:10mm) -| ([yshift=-1pt]storage.south);
   \draw (im.north) |- (270:10mm) -| ([yshift=-1pt]storage.south);
 \end{tikzpicture}
+
+
+The common data flow for Artipie upload: client is sending some binary artifact
+to the server, server find responsible repository to process the request,
+repository is saving the stream to the storage, and after complete it updates metadata
+of the repository (it's most common scenario, some repositories works differently,
+e.g Docker uses metadata as path).
+
+
+\begin{center}
+\begin{tikzpicture}
+\begin{umlseqdiag}
+\umlactor[class=Client]{mvn}
+\umlobject[class=Server]{Artipie}
+\umlobject[class=Repo]{Maven}
+\umlobject[class=Storage]{S3}
+
+\begin{umlcall}[op={mvn:deploy}, type=synchron, return={200 OK}]{mvn}{Artipie}
+  \begin{umlcall}[op={request}, type=synchron, return={response}]{Artipie}{Maven}
+    \begin{umlcall}[op={upload}, type=asynchron, return={complete}]{Maven}{S3}
+    \end{umlcall}
+    \begin{umlcall}[op={update metadata}, type=asynchron, return={complete}]{Maven}{S3}
+    \end{umlcall}
+  \end{umlcall}
+\end{umlcall}
+
+\end{umlseqdiag}
+\end{tikzpicture}
+\end{center}
 
 Engine store repository configuration in a .yml file. An example:
 \begin{Verbatim}[tabsize=2]
