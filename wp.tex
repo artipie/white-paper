@@ -268,6 +268,31 @@ authentication and authorization, deployment, publishing,
 download, removal, usage tracking, email notifications, mirroring,
 and so on.
 
+\subsection{Compare with existing solutions}
+\label{ref:comparation}
+
+\begin{tabular}{| l | p{3cm} | p{3cm} | p{3cm} |}
+\hline
+  Feature & Artipie & Artifactory & Nexus \\
+  \hline
+  Cloud storage providers & S3 based API clouds & AWS S3, Google Cloud, Azure & No \\
+  \hline
+  Supported repository type
+  & Maven, RPM, NPM, Docker, NuGet, PHP-composer, binary files, PyPi, Go, Gem
+  & Bower, Chef, CocoaPods, Conan, Conda, CRAN, Debian, Docker, Git LFS, Go, Helm, Maven, NPM, NuGet, Opkg, P2, PHP-composer, Puppet, PyPi, RPM, Gem, SBT, Vagrant, VCS
+  & Bower, Docker, NPM, PyPI, Raw, RubyGems, Yum* \\
+  \hline
+  Installation and maintainance
+  & Easy to install via Docker image or to cluster
+  & Can be installed locally, but require a team of system administrators to support the cluster
+  & Same as Artifactory \\
+  \hline
+  Performance & TODO & TODO & TODO \\
+  \hline
+\end{tabular}
+
+* Nexus can uses external plugins to support more repository types
+
 \subsection{Expected Metrics}
 \label{ref:metrics}
 
