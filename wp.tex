@@ -342,6 +342,13 @@ Architecure is consisted of 4 essential parts:
   \draw (repos.north) -- (repo-3.north);
 \end{tikzpicture}
 
+\subsection{Design considerations}
+
+All of the Artipie components are based on reactive, asynchronous, non-blockng
+and back-pressured streams and asynchronous, reactive and non-blocking 
+programming principles, allowing Artipie to withstand heavy workloads with a small
+amount of kernel threads.
+
 \subsection{Artipie engine}
 \label{sec:arti-engine}
 Artipie engine is a Java application, which exposes an HTTP endpoint for repository access and management operations.
